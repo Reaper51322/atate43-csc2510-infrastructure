@@ -1,0 +1,35 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Update APT
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Copy Apache configuration file
+      ansible.builtin.copy:
+        src: files/config/apache.conf
+        dest: /etc/apache2/apache.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy website index file
+      ansible.builtin.copy:
+        src: files/site/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create symbolic link for index.html
+      ansible.builtin.file:
+        src: /var/www/html/index.html
+        dest: /var/www/html/index.html
+        state: link
+
+    - name: Restart Apache service
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
+
